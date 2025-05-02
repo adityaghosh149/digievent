@@ -1,5 +1,6 @@
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { v4 as uuidv4 } from "uuid";
 
 const adminSchema = new mongoose.Schema(
     {
