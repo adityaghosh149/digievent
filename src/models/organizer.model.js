@@ -65,6 +65,7 @@ organizerSchema.methods.generateAccessToken = async function () {
             _id: this._id,
             role: "Organizer",
             email: this.email,
+            phoneNumber: this.phoneNumber,
         },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
