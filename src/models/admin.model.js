@@ -3,18 +3,12 @@ import { v4 as uuidv4 } from "uuid";
 
 const adminSchema = new mongoose.Schema(
     {
-        admin_id: {
-            type: String,
-            default: () => uuidv4(),
-            unique: true,
-            index: true
-        },
-        super_admin_id: {
+        superAdminId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: "SuperAdmin"
         },
-        university_name: {
+        universityName: {
             type: String,
             required: true,
             trim: true
@@ -26,7 +20,7 @@ const adminSchema = new mongoose.Schema(
             lowercase: true,
             trim: true
         },
-        phone_number: {
+        phoneNumber: {
             type: String,
             required: true,
             unique: true,
@@ -48,19 +42,19 @@ const adminSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        subscription_status: {
+        subscriptionStatus: {
             type: String,
             enum: ["Active", "Pending", "Expired"],
             default: "Active"
         },
-        subscription_end_date: {
+        subscriptionEndDate: {
             type: Date,
             default: null
         },
         refreshToken: {
             type: String,
         },
-        is_deleted: {
+        isDeleted: {
             type: Boolean,
             default: false
         }
