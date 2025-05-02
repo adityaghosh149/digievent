@@ -1,20 +1,13 @@
 import mongoose from "mongoose";
-import { v4 as uuidv4 } from "uuid";
 
 const organizerSchema = new mongoose.Schema(
     {
-        organizer_id: {
-            type: String,
-            default: () => uuidv4(),
-            unique: true,
-            index: true
-        },
-        admin_id: {
+        adminId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: "Admin" 
         },
-        organizer_name: {
+        organizerName: {
             type: String,
             required: true,
             trim: true
@@ -26,7 +19,7 @@ const organizerSchema = new mongoose.Schema(
             lowercase: true,
             trim: true
         },
-        phone_number: {
+        phoneNumber: {
             type: String,
             required: true,
             unique: true,
@@ -39,7 +32,7 @@ const organizerSchema = new mongoose.Schema(
         refreshToken: {
             type: String,
         },
-        is_deleted: {
+        isDeleted: {
             type: Boolean,
             default: false
         }
