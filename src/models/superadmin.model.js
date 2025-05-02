@@ -1,16 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { v4 as uuidv4 } from "uuid";
 
 const superAdminSchema = new mongoose.Schema(
     {
-        super_admin_id: {
-            type: String,
-            default: () => uuidv4(),
-            unique: true,
-            index: true
-        },
         email: {
             type: String,
             required: true,
@@ -18,7 +11,13 @@ const superAdminSchema = new mongoose.Schema(
             lowercase: true,
             trim: true
         },
-        phone_number: {
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+            
+        },
+        phoneNumber: {
             type: String,
             required: true,
             unique: true,
@@ -31,7 +30,7 @@ const superAdminSchema = new mongoose.Schema(
         refreshToken: {
             type: String,
         },
-        is_deleted: {
+        isDeleted: {
             type: Boolean,
             default: false
         }
