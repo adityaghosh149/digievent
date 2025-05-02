@@ -1,34 +1,27 @@
 import mongoose from "mongoose";
-import { v4 as uuidv4 } from "uuid";
 
 const bookingSchema = new mongoose.Schema(
     {
-        booking_id: {
-            type: String,
-            default: () => uuidv4(),
-            unique: true,
-            index: true
-        },
-        event_id: {
+        eventId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: "Event"
         },
-        student_id: {
+        studentId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: "Student"
         },
-        booking_status: {
+        bookingStatus: {
             type: String,
             enum: ["Confirmed", "Temporary", "Cancelled"],
             default: "Temporary"
         },
-        expires_at: {
+        expiresAt: {
             type: Date,
             default: null // Only used for temporary bookings
         },
-        is_refunded: {
+        isRefunded: {
             type: Boolean,
             default: false
         }
