@@ -57,6 +57,9 @@ const adminSchema = new mongoose.Schema(
             type: Date,
             default: null
         },
+        refreshToken: {
+            type: String,
+        },
         is_deleted: {
             type: Boolean,
             default: false

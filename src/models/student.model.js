@@ -55,6 +55,9 @@ const studentSchema = new mongoose.Schema(
             default: 0,
             min: 0
         },
+        refreshToken: {
+            type: String,
+        },
         is_deleted: {
             type: Boolean,
             default: false

@@ -36,6 +36,9 @@ const organizerSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        refreshToken: {
+            type: String,
+        },
         is_deleted: {
             type: Boolean,
             default: false
