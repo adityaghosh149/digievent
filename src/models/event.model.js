@@ -1,39 +1,32 @@
 import mongoose from "mongoose";
-import { v4 as uuidv4 } from "uuid";
 
 const eventSchema = new mongoose.Schema(
     {
-        event_id: {
-            type: String,
-            default: () => uuidv4(),
-            unique: true,
-            index: true
-        },
-        organizer_id: {
+        organizerId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: "Organizer"
         },
-        cover_image: {
+        coverImage: {
             type: String,
             default: null // URL of image, can be null
         },
-        total_tickets: {
+        totalTickets: {
             type: Number,
             required: true,
             min: 0
         },
-        booked_tickets: {
+        bookedTickets: {
             type: Number,
             default: 0,
             min: 0
         },
-        temporary_booked_tickets: {
+        temporaryBookedTickets: {
             type: Number,
             default: 0,
             min: 0
         },
-        ticket_price: {
+        ticketPrice: {
             type: mongoose.Types.Decimal128,
             default: 0.00
         },
@@ -58,7 +51,7 @@ const eventSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        details_pdf: {
+        detailsPdf: {
             type: String,
             default: null // PDF file URL
         },
@@ -67,7 +60,7 @@ const eventSchema = new mongoose.Schema(
             enum: ["Pending", "Approved", "Rejected"],
             default: "Pending"
         },
-        is_deleted: {
+        isDeleted: {
             type: Boolean,
             default: false
         }
