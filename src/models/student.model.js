@@ -21,6 +21,12 @@ const studentSchema = new mongoose.Schema(
             lowercase: true,
             trim: true
         },
+        phoneNumber: {
+            type: String,
+            required: true,
+            unique: true,
+            trim: true
+        },
         password: {
             type: String,
             required: true
