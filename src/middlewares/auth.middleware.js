@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { Admin } from "../models/admin.model.js";
 import { Organizer } from "../models/organizer.model.js";
 import { Student } from "../models/student.model.js";
-import { SuperAdmin } from "../models/superAdmin.model.js";
+import { SuperAdmin } from "../models/superadmin.model.js";
 import { APIError } from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
