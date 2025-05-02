@@ -59,7 +59,7 @@ superAdminSchema.methods.generateAccessToken = async function () {
     return jwt.sign(
         {
             _id: this._id,
-            role: this.role,
+            role: "SuperAdmin",
             email: this.email,
         },
         process.env.ACCESS_TOKEN_SECRET,
