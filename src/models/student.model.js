@@ -1,15 +1,8 @@
-import mongoose, { Mongoose } from "mongoose";
-import { v4 as uuidv4 } from "uuid";
+import mongoose from "mongoose";
 
 const studentSchema = new mongoose.Schema(
     {
-        student_id: {
-            type: String,
-            default: () => uuidv4(),
-            unique: true,
-            index: true
-        },
-        admin_id: {
+        adminId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: "Admin"
@@ -50,7 +43,7 @@ const studentSchema = new mongoose.Schema(
             required: true,
             min: 1
         },
-        temporary_booking_count: {
+        temporaryBookingCount: {
             type: Number,
             default: 0,
             min: 0
@@ -58,7 +51,7 @@ const studentSchema = new mongoose.Schema(
         refreshToken: {
             type: String,
         },
-        is_deleted: {
+        isDeleted: {
             type: Boolean,
             default: false
         }
