@@ -2,6 +2,10 @@ import { SuperAdmin } from "../models/superadmin.model.js";
 import { APIError } from "../utils/apiError.js";
 import { APIResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import {
+    replaceOnCloudinary,
+    uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 import { isStrongPassword, isValidEmail } from "../utils/validators.js";
 
 // Login
@@ -122,6 +126,8 @@ const registerSuperAdmin = asyncHandler(async (req, res) => {
         name,
         phoneNumber,
         password,
+        avatar: null,
+        avatarPublicId: null,
         isRoot: req.body.isRoot === true && requester.isRoot ? true : false,
         isRootOnlyFlag: req.body.isRootOnlyFlag === true && requester.isRoot ? true : false,
     });
@@ -139,6 +145,79 @@ const registerSuperAdmin = asyncHandler(async (req, res) => {
     );
 });
 
+// Update SuperAdmin
+const updateSuperAdmin = asyncHandler(async (req, res) => {
+    const { superAdminId } = req.params; // Extracting SuperAdmin ID from params
+    const { fullName, phoneNumber, password, newPassword, confirmPassword } = req.body;
+    
+    // Finding the SuperAdmin by ID
+    const superAdmin = await SuperAdmin.findById(superAdminId);
+    if (!superAdmin) {
+        throw new APIError(404, "❌ SuperAdmin not found");
+    }
+
+    // Password update logic (only if password and newPassword are provided)
+    if (password && newPassword && confirmPassword) {
+        // Check if the current password is correct
+        const isPasswordValid = await superAdmin.isPasswordCorrect(password);
+        if (!isPasswordValid) {
+            throw new APIError(401, "❌ Invalid current password");
+        }
+
+        // Validate if new password and confirm password match
+        if (newPassword !== confirmPassword) {
+            throw new APIError(400, "⚠️ New password and confirm password do not match");
+        }
+
+        // The password update will be handled by the pre-save hook in the model
+        superAdmin.password = newPassword; // Update password (this will trigger the pre-save hook for hashing)
+    }
+
+    // Update phone number if provided
+    if (phoneNumber) {
+        superAdmin.phoneNumber = phoneNumber;
+    }
+
+    // Handle avatar image update (if new avatar is uploaded)
+    if (req.files?.avatar) {
+        // Upload the new avatar to Cloudinary
+        const avatarLocalPath = req.files.avatar[0].path;
+        const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
+        if (!avatarUpload) {
+            throw new APIError(500, "⚠️ Failed to upload avatar image");
+        }
+
+        // If avatar is already uploaded, replace it
+        if (superAdmin.avatarPublicId) {
+            await replaceOnCloudinary(superAdmin.avatarPublicId, avatarLocalPath);
+        }
+
+        // Update the SuperAdmin's avatar and avatarPublicId
+        superAdmin.avatar = avatarUpload.secure_url;
+        superAdmin.avatarPublicId = avatarUpload.public_id;
+    }
+
+    // Update other fields
+    if (fullName) {
+        superAdmin.fullName = fullName;
+    }
+
+    // Save the updated SuperAdmin data
+    await superAdmin.save();
+
+    // Return success response with updated SuperAdmin data (excluding sensitive info)
+    const updatedSuperAdmin = await SuperAdmin.findById(superAdminId).select("-password -refreshToken");
+
+    return res.status(200).json(
+        new APIResponse(
+            200, 
+            updatedSuperAdmin, 
+            "✅ SuperAdmin updated successfully"
+        )
+    );
+});
+
+// Delete SuperAdmin
 const deleteSuperAdmin = asyncHandler(async (req, res) => {
     const requester = req.user;
     const { id } = req.params;  // The ID of the SuperAdmin to be deleted
@@ -175,5 +254,4 @@ const deleteSuperAdmin = asyncHandler(async (req, res) => {
     );
 });
 
-export { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin };
-
+export { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin, updateSuperAdmin };

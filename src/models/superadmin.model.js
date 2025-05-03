@@ -27,8 +27,17 @@ const superAdminSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        avatar: {
+            type: String,
+            default: null, 
+        },
+        avatarPublicId: {
+            type: String, 
+            default: null,
+        },
         refreshToken: {
             type: String,
+            default: null
         },
         isRoot: {
             type: Boolean,
