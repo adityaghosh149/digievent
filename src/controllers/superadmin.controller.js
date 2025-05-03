@@ -139,5 +139,41 @@ const registerSuperAdmin = asyncHandler(async (req, res) => {
     );
 });
 
-export { loginSuperAdmin, logoutSuperAdmin };
+const deleteSuperAdmin = asyncHandler(async (req, res) => {
+    const requester = req.user;
+    const { id } = req.params;  // The ID of the SuperAdmin to be deleted
+
+    // Check if the requester is a Root SuperAdmin
+    if (!requester.isRoot) {
+        throw new APIError(
+            403,
+            "⛔ Forbidden: Only a Root SuperAdmin can delete other SuperAdmins"
+        );
+    }
+
+    // Prevent deletion of the Root SuperAdmin
+    if (requester._id.toString() === id) {
+        throw new APIError(400, "⚠️ You cannot delete your own account (Root SuperAdmin)");
+    }
+
+    // Find the SuperAdmin to be deleted
+    const deleteSuperAdmin = await SuperAdmin.findById(id);
+
+    if (!deleteSuperAdmin) {
+        throw new APIError(404, "⚠️ SuperAdmin not found");
+    }
+
+    // Proceed to delete the SuperAdmin
+    await SuperAdmin.findByIdAndDelete(id);
+
+    return res.status(200).json(
+        new APIResponse(
+            200,
+            {},
+            "✅ SuperAdmin deleted successfully!"
+        )
+    );
+});
+
+export { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin };
 
