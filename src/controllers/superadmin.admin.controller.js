@@ -1,7 +1,7 @@
 import { Admin } from "../models/admin.model.js";
 import { APIError } from "../utils/apiError.js";
 import { APIResponse } from "../utils/apiResponse.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils/asyncHander.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import {
     isStrongPassword,

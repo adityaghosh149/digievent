@@ -2,6 +2,7 @@ import { Router } from "express";
 import { registerAdmin } from "../controllers/superadmin.admin.controller.js";
 import { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin, updateSuperAdmin } from "../controllers/superadmin.auth.controller.js";
 import { requireRootSuperAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 

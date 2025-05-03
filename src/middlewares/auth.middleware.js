@@ -4,7 +4,7 @@ import { Organizer } from "../models/organizer.model.js";
 import { Student } from "../models/student.model.js";
 import { SuperAdmin } from "../models/superadmin.model.js";
 import { APIError } from "../utils/apiError.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils/asyncHander.js";
 
 // Map roles to corresponding models
 const modelMap = {
