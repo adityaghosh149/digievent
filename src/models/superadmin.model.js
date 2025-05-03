@@ -30,6 +30,16 @@ const superAdminSchema = new mongoose.Schema(
         refreshToken: {
             type: String,
         },
+        isRoot: {
+            type: Boolean,
+            default: false
+        },
+        isRootOnlyFlag: {
+            type: Boolean,
+            default: false,
+            unique: true,
+            sparse: true // required so only "true" values are indexed
+        },
         isDeleted: {
             type: Boolean,
             default: false
@@ -41,15 +51,24 @@ const superAdminSchema = new mongoose.Schema(
 );
 
 superAdminSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
-    try {
+    if (this.isModified("password")) {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
-        next();
-    } catch (err) {
-        next(err);
     }
+
+    // Enforce unique isRoot
+    if (this.isRoot) {
+        const existingRoot = await mongoose.models.SuperAdmin.findOne({ isRoot: true });
+
+        // If another root exists and it's not this one
+        if (existingRoot && existingRoot._id.toString() !== this._id.toString()) {
+            return next(new Error("Only one root SuperAdmin is allowed."));
+        }
+    }
+
+    next();
 });
+
 
 superAdminSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password);
