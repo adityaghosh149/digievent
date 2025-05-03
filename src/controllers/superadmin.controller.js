@@ -242,8 +242,11 @@ const deleteSuperAdmin = asyncHandler(async (req, res) => {
         throw new APIError(404, "⚠️ SuperAdmin not found");
     }
 
-    // Proceed to delete the SuperAdmin
-    await SuperAdmin.findByIdAndDelete(id);
+    // Perform a soft delete by setting `isDeleted` to true
+    deleteSuperAdmin.isDeleted = true;
+    
+    // Save the updated SuperAdmin document
+    await deleteSuperAdmin.save();
 
     return res.status(200).json(
         new APIResponse(
