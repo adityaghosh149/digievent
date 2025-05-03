@@ -33,6 +33,14 @@ const adminSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        avatar: {
+            type: String,
+            default: null, 
+        },
+        avatarPublicId: {
+            type: String, 
+            default: null,
+        },
         address: {
             type: String,
             required: true

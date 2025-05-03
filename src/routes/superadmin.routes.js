@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { registerAdmin } from "../controllers/superadmin.admin.controller.js";
 import { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin, updateSuperAdmin } from "../controllers/superadmin.auth.controller.js";
 import { requireRootSuperAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -15,5 +16,12 @@ router.route("/update").put(
 );
 router.route("/delete").post(verifyJWT, requireRootSuperAdmin, deleteSuperAdmin)
 router.route("/logout").post(verifyJWT, logoutSuperAdmin);
+
+// admin routes
+router.route("/admin/register").post(
+    verifyJWT, 
+    upload.fields([{ name: "avatar", maxCount: 1 }]), 
+    registerAdmin
+);
 
 export default router;
