@@ -55,12 +55,16 @@ const registerAdmin = asyncHandler(async (req, res) => {
     let avatarPublicId = null;
 
     // If avatar file is provided, upload to Cloudinary
-    if (req.file) {
+    if (req?.file) {
+        // Upload the file to Cloudinary
         const response = await uploadOnCloudinary(req.file.path);
+
+        // Check if the upload was successful
         if (!response) {
             throw new APIError(500, "❌ Failed to upload avatar to Cloudinary");
         }
 
+        // Assign the secure URL and public ID to the avatar variables
         avatar = response.secure_url;
         avatarPublicId = response.public_id;
     }

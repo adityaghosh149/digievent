@@ -188,22 +188,18 @@ const updateSuperAdmin = asyncHandler(async (req, res) => {
     }
 
     // Handle avatar image update (if new avatar is uploaded)
-    if (req.files?.avatar) {
-        // Upload the new avatar to Cloudinary
-        const avatarLocalPath = req.files.avatar[0].path;
-        const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
-        if (!avatarUpload) {
-            throw new APIError(500, "⚠️ Failed to upload avatar image");
+    if (req?.file) {
+        // Upload the file to Cloudinary
+        const response = await uploadOnCloudinary(req.file.path);
+
+        // Check if the upload was successful
+        if (!response) {
+            throw new APIError(500, "❌ Failed to upload avatar to Cloudinary");
         }
 
-        // If avatar is already uploaded, replace it
-        if (superAdmin.avatarPublicId) {
-            await replaceOnCloudinary(superAdmin.avatarPublicId, avatarLocalPath);
-        }
-
-        // Update the SuperAdmin's avatar and avatarPublicId
-        superAdmin.avatar = avatarUpload.secure_url;
-        superAdmin.avatarPublicId = avatarUpload.public_id;
+        // Assign the secure URL and public ID to the avatar variables
+        avatar = response.secure_url;
+        avatarPublicId = response.public_id;
     }
 
     // Update other fields
