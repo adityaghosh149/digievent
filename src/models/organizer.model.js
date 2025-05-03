@@ -18,13 +18,15 @@ const organizerSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
+            index: true,
             lowercase: true,
-            trim: true
+            trim: true,
         },
         phoneNumber: {
             type: String,
             required: true,
             unique: true,
+            index: true,
             trim: true
         },
         password: {
@@ -36,7 +38,8 @@ const organizerSchema = new mongoose.Schema(
         },
         isDeleted: {
             type: Boolean,
-            default: false
+            default: false,
+            index: true,
         }
     },
     {

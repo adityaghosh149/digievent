@@ -19,13 +19,15 @@ const studentSchema = new mongoose.Schema(
             required: true,
             unique: true,
             lowercase: true,
-            trim: true
+            index: true,
+            trim: true,
         },
         phoneNumber: {
             type: String,
             required: true,
             unique: true,
-            trim: true
+            index: true,
+            trim: true,
         },
         password: {
             type: String,
@@ -61,7 +63,8 @@ const studentSchema = new mongoose.Schema(
         },
         isDeleted: {
             type: Boolean,
-            default: false
+            default: false,
+            index: true
         }
     },
     {
