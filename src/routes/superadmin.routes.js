@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin, updateSuperAdmin } from "../controllers/superadmin.controller";
+import { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin, updateSuperAdmin } from "../controllers/superadmin.auth.controller.js";
 import { requireRootSuperAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();

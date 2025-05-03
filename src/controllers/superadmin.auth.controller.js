@@ -8,7 +8,7 @@ import {
 } from "../utils/cloudinary.js";
 import { isStrongPassword, isValidEmail } from "../utils/validators.js";
 
-// Login
+// Login SuperAdmin
 const loginSuperAdmin = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
@@ -54,7 +54,7 @@ const loginSuperAdmin = asyncHandler(async (req, res) => {
         );
 });
 
-// Logout
+// Logout SuperAdmin
 const logoutSuperAdmin = asyncHandler(async (req, res) => {
     const { user } = req.body;
 
@@ -80,7 +80,7 @@ const logoutSuperAdmin = asyncHandler(async (req, res) => {
         .json(new APIResponse(200, {}, "✅ SuperAdmin logged out successfully"));
 });
 
-// Register
+// Register SuperAdmin
 const registerSuperAdmin = asyncHandler(async (req, res) => {
     const requester = req.user;
 
