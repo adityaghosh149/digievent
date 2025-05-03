@@ -9,5 +9,10 @@ const isStrongPassword = (password) => {
     return passwordRegex.test(password);
 };
 
-export { isStrongPassword, isValidEmail };
+function isValidIndianPhoneNumber(phoneNumber) {
+    const indianPhoneNumberRegex = /^[6-9]\d{9}$/;
+    return indianPhoneNumberRegex.test(phoneNumber);
+}
+
+export { isStrongPassword, isValidEmail, isValidIndianPhoneNumber };
 

@@ -6,7 +6,7 @@ import {
     replaceOnCloudinary,
     uploadOnCloudinary,
 } from "../utils/cloudinary.js";
-import { isStrongPassword, isValidEmail } from "../utils/validators.js";
+import { isStrongPassword, isValidEmail, isValidIndianPhoneNumber } from "../utils/validators.js";
 
 // Login SuperAdmin
 const loginSuperAdmin = asyncHandler(async (req, res) => {
@@ -96,6 +96,10 @@ const registerSuperAdmin = asyncHandler(async (req, res) => {
         throw new APIError(400, "📧 Invalid email format!");
     }
 
+    if (!isValidIndianPhoneNumber(phoneNumber)) {
+        throw new APIError(400, "📱 Invalid phone number! Must be a valid 10-digit Indian number starting with 6-9.");
+    }
+
     if (!isStrongPassword(password)) {
         throw new APIError(
             400,
@@ -175,6 +179,11 @@ const updateSuperAdmin = asyncHandler(async (req, res) => {
 
     // Update phone number if provided
     if (phoneNumber) {
+        
+        if (!isValidIndianPhoneNumber(phoneNumber)) {
+            throw new APIError(400, "📱 Invalid phone number! Must be a valid 10-digit Indian number starting with 6-9.");
+        }
+
         superAdmin.phoneNumber = phoneNumber;
     }
 
@@ -258,3 +267,4 @@ const deleteSuperAdmin = asyncHandler(async (req, res) => {
 });
 
 export { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin, updateSuperAdmin };
+
