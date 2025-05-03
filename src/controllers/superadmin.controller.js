@@ -49,5 +49,32 @@ const loginSuperAdmin = asyncHandler(async (req, res) => {
         );
 });
 
+const logoutSuperAdmin = asyncHandler(async (req, res) => {
+    const { user } = req.body;
 
-export { loginSuperAdmin };
+    await SuperAdmin.findByIdAndUpdate(
+        user?._id,
+        {
+            $set: {
+                refreshToken: undefined,
+            },
+        },
+        { new: true }
+    );
+
+    const options = {
+        httpOnly: true,
+        secure: true,
+    };
+
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new APIResponse(200, {}, "✅ SuperAdmin logged out successfully"));
+});
+
+
+
+export { loginSuperAdmin, logoutSuperAdmin };
+
