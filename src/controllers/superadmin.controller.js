@@ -78,71 +78,63 @@ const logoutSuperAdmin = asyncHandler(async (req, res) => {
 
 // Register
 const registerSuperAdmin = asyncHandler(async (req, res) => {
-    const { email, name, phoneNumber, password, isRoot = false } = req.body;
+    const requester = req.user;
 
-    // Validation: Required fields
+    // Extract required fields
+    const { email, name, phoneNumber, password } = req.body;
+
+    // Validate required fields
     if (!email || !name || !phoneNumber || !password) {
-        throw new APIError(400, "⚠️ All fields are required! 🚫");
+        throw new APIError(400, "⚠️ All fields are required!");
     }
 
-    // Validate email format
     if (!isValidEmail(email)) {
-        throw new APIError(400, "⚠️ Invalid email address! 📧❌");
+        throw new APIError(400, "📧 Invalid email format!");
     }
 
-    // Validate password strength
     if (!isStrongPassword(password)) {
         throw new APIError(
             400,
-            "⚠️ Weak password! Must be at least 8 characters long, include uppercase, lowercase, a number, and a special character. 🔐❌"
+            "🔐 Weak password! Must include uppercase, lowercase, number, special character, and be at least 8 characters long."
         );
     }
 
-    // Check if SuperAdmin already exists by email or phone
-    const existingAdmin = await SuperAdmin.findOne({
+    // Check for existing SuperAdmin with same email or phone number
+    const existing = await SuperAdmin.findOne({
         $or: [{ email }, { phoneNumber }],
     });
 
-    if (existingAdmin) {
-        throw new APIError(
-            409,
-            "⚠️ SuperAdmin with this email or phone number already exists! 👤❌"
-        );
+    if (existing) {
+        throw new APIError(409, "⚠️ SuperAdmin with this email or phone number already exists!");
     }
 
-    // If root, ensure no other root exists
-    if (isRoot) {
-        const existingRoot = await SuperAdmin.findOne({ isRoot: true });
+    // Optional: If `isRootOnlyFlag` is passed in the request body, validate exclusivity
+    if (req.body.isRootOnlyFlag) {
+        const existingRoot = await SuperAdmin.findOne({ isRootOnlyFlag: true });
         if (existingRoot) {
-            throw new APIError(400, "❌ A root SuperAdmin already exists");
+            throw new APIError(409, "⚠️ A Root SuperAdmin already exists!");
         }
     }
 
-    // Create the SuperAdmin
-    const superAdmin = await SuperAdmin.create({
+    // Create the new SuperAdmin (do NOT allow client to set isRoot directly unless root is assigning it intentionally)
+    const newSuperAdmin = await SuperAdmin.create({
         email,
         name,
         phoneNumber,
         password,
-        isRoot,
-        isRootOnlyFlag: isRoot ? true : undefined,
+        isRoot: req.body.isRoot === true && requester.isRoot ? true : false,
+        isRootOnlyFlag: req.body.isRootOnlyFlag === true && requester.isRoot ? true : false,
     });
 
-    // Fetch the created admin without sensitive fields
-    const createdSuperAdmin = await SuperAdmin.findById(superAdmin._id).select(
+    const created = await SuperAdmin.findById(newSuperAdmin._id).select(
         "-password -refreshToken"
     );
 
-    if (!createdSuperAdmin) {
-        throw new APIError(500, "⚠️ SuperAdmin creation failed! ❌");
-    }
-
-    // Send success response
     return res.status(201).json(
         new APIResponse(
             201,
-            createdSuperAdmin,
-            "🎉 SuperAdmin registered successfully! ✅"
+            created,
+            "🎉 SuperAdmin registered successfully!"
         )
     );
 });

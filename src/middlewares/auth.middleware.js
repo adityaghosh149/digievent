@@ -45,5 +45,21 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
     }
 });
 
-export { verifyJWT };
+const requireRootSuperAdmin = asyncHandler( async (req, res, next) => {
+    const user = req.user;
+
+    if (!user ||
+        user.role !== "SuperAdmin" ||
+        !user.isRoot ||
+        user.isDeleted) {
+        throw new APIError(
+            403,
+            "⛔ Forbidden: Only a Root SuperAdmin is authorized to perform this action"
+        );
+    }
+
+    next();
+});
+
+export { requireRootSuperAdmin, verifyJWT };
 
