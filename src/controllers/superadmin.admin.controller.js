@@ -9,6 +9,7 @@ import {
     isValidIndianPhoneNumber,
 } from "../utils/validators.js";
 
+// Register Admin
 const registerAdmin = asyncHandler(async (req, res) => {
     const requester = req.user; // from verifyJWT middleware (must be SuperAdmin)
 
@@ -94,5 +95,25 @@ const registerAdmin = asyncHandler(async (req, res) => {
         ));
 });
 
-export { registerAdmin };
+// Suspend Admin
+export const suspendAdmin = asyncHandler(async (req, res) => {
+    const { adminId } = req.params;
+
+    const admin = await Admin.findById(adminId);
+    if (!admin || admin.isDeleted) {
+        throw new APIError(404, "❌ Admin not found");
+    }
+
+    // Update status to Suspended (using "Expired" as per schema)
+    admin.subscriptionStatus = "Expired";
+
+    await admin.save();
+
+    return res.status(200).json(
+        new APIResponse(200, null, "⛔ Admin suspended successfully")
+    );
+});
+
+
+export { registerAdmin, suspendAdmin };
 
