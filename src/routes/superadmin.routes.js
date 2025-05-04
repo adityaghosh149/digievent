@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerAdmin, suspendAdmin } from "../controllers/superadmin.admin.controller.js";
+import { registerAdmin, resumeAdmin, suspendAdmin } from "../controllers/superadmin.admin.controller.js";
 import { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin, updateSuperAdmin } from "../controllers/superadmin.auth.controller.js";
 import { requireRootSuperAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
 import { uploadFile } from "../middlewares/multer.middleware.js";
@@ -25,5 +25,6 @@ router.route("/admin/register").post(
     registerAdmin
 );
 router.route("admin/suspend/:adminId").post(verifyJWT, suspendAdmin);
+router.route("admin/resume/:adminId").post(verifyJWT, resumeAdmin);
 
 export default router;

@@ -96,7 +96,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
 });
 
 // Suspend Admin
-export const suspendAdmin = asyncHandler(async (req, res) => {
+const suspendAdmin = asyncHandler(async (req, res) => {
     const { adminId } = req.params;
 
     const admin = await Admin.findById(adminId);
@@ -114,6 +114,22 @@ export const suspendAdmin = asyncHandler(async (req, res) => {
     );
 });
 
+const resumeAdmin = asyncHandler(async (req, res) => {
+    const { adminId } = req.params;
 
-export { registerAdmin, suspendAdmin };
+    const admin = await Admin.findById(adminId);
+    if (!admin || admin.isDeleted) {
+        throw new APIError(404, "❌ Admin not found");
+    }
 
+    // Resume subscription
+    admin.subscriptionStatus = "Active";
+
+    await admin.save();
+
+    return res.status(200).json(
+        new APIResponse(200, null, "✅ Admin resumed successfully")
+    );
+});
+
+export { registerAdmin, resumeAdmin, suspendAdmin };
