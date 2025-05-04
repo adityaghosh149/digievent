@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerAdmin, resumeAdmin, suspendAdmin } from "../controllers/superadmin.admin.controller.js";
+import { getAllAdmins, registerAdmin, resumeAdmin, suspendAdmin } from "../controllers/superadmin.admin.controller.js";
 import { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin, updateSuperAdmin } from "../controllers/superadmin.auth.controller.js";
 import { getAllHelpRequests, markHelpRequestAsRead, markHelpRequestAsResolved } from "../controllers/superadmin.helpRequests.controller.js";
 import { requireRootSuperAdmin, requireSuperAdmin, verifyJWT } from "../middlewares/auth.middleware.js";

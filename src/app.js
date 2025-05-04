@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 
 import superAdminRoutes from "./routes/superadmin.routes.js";
+import adminRoutes from "./routes/admin.routes.js"
 
 const app = express();
 

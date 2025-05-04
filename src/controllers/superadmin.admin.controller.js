@@ -130,7 +130,7 @@ const resumeAdmin = asyncHandler(async (req, res) => {
     );
 });
 
-export const getAllAdmins = asyncHandler(async (req, res) => {
+const getAllAdmins = asyncHandler(async (req, res) => {
     const { subscriptionStatus } = req.query;
 
     const filter = { isDeleted: false };
