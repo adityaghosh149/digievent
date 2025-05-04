@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { registerAdmin, resumeAdmin, suspendAdmin } from "../controllers/superadmin.admin.controller.js";
 import { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin, updateSuperAdmin } from "../controllers/superadmin.auth.controller.js";
-import { getAllHelpRequests } from "../controllers/superadmin.helpRequests.controller.js";
+import { getAllHelpRequests, markHelpRequestAsRead } from "../controllers/superadmin.helpRequests.controller.js";
 import { requireRootSuperAdmin, requireSuperAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
 import { uploadFile } from "../middlewares/multer.middleware.js";
 
@@ -20,11 +20,12 @@ router.route("/update").put(
     uploadFile("avatar", "image"),
     updateSuperAdmin
 );
-router.route("/delete").post(verifyJWT, requireRootSuperAdmin, deleteSuperAdmin)
+router.route("/delete").post(verifyJWT, requireRootSuperAdmin, deleteSuperAdmin);
 router.route("/logout").post(verifyJWT,requireSuperAdmin, logoutSuperAdmin);
 
 // help requests
-router.route("/help-requests").get(verifyJWT, requireSuperAdmin, getAllHelpRequests)
+router.route("/help-requests").get(verifyJWT, requireSuperAdmin, getAllHelpRequests);
+router.route("/read/:helpRequestId").patch(verifyJWT, requireSuperAdmin, markHelpRequestAsRead);
 
 // admin routes
 router.route("/admins").get(verifyJWT, requireSuperAdmin, getAllAdmins);
