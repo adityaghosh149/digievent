@@ -48,7 +48,7 @@ const loginSuperAdmin = asyncHandler(async (req, res) => {
         .json(
             new APIResponse(
                 200,
-                { user, accessToken, refreshToken },
+                user,
                 "✅ SuperAdmin logged in successfully"
             )
         );

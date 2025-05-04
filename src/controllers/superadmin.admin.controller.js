@@ -149,3 +149,4 @@ const getAllAdmins = asyncHandler(async (req, res) => {
 });
 
 export { getAllAdmins, registerAdmin, resumeAdmin, suspendAdmin };
+
