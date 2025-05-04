@@ -61,5 +61,15 @@ const requireRootSuperAdmin = asyncHandler( async (req, res, next) => {
     next();
 });
 
-export { requireRootSuperAdmin, verifyJWT };
+const requireSuperAdmin = (req, res, next) => {
+    const user = req.user;
+
+    if (!user && req.user?.role !== "SuperAdmin") {
+        return res.status(403).json({ message: "⛔ Access denied. SuperAdmin only." });
+    }
+
+    next();
+};
+
+export { requireRootSuperAdmin, requireSuperAdmin, verifyJWT };
 

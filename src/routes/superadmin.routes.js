@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { registerAdmin, resumeAdmin, suspendAdmin } from "../controllers/superadmin.admin.controller.js";
 import { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin, updateSuperAdmin } from "../controllers/superadmin.auth.controller.js";
-import { requireRootSuperAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
+import { requireRootSuperAdmin, requireSuperAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
 import { uploadFile } from "../middlewares/multer.middleware.js";
 
 const router = Router();
@@ -19,13 +19,14 @@ router.route("/delete").post(verifyJWT, requireRootSuperAdmin, deleteSuperAdmin)
 router.route("/logout").post(verifyJWT, logoutSuperAdmin);
 
 // admin routes
-router.route("/admins").get(verifyJWT, getAllAdmins);
+router.route("/admins").get(verifyJWT, requireSuperAdmin, getAllAdmins);
 router.route("/admin/register").post(
     verifyJWT, 
+    requireSuperAdmin,
     uploadFile("avatar", "image"),  // Upload 'avatar' as image
     registerAdmin
 );
-router.route("admin/suspend/:adminId").patch(verifyJWT, suspendAdmin);
-router.route("admin/resume/:adminId").patch(verifyJWT, resumeAdmin);
+router.route("admin/suspend/:adminId").patch(verifyJWT, requireSuperAdmin, suspendAdmin);
+router.route("admin/resume/:adminId").patch(verifyJWT, requireSuperAdmin, resumeAdmin);
 
 export default router;
