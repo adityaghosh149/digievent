@@ -67,7 +67,7 @@ const markHelpRequestAsRead = asyncHandler(async (req, res) => {
                 admin: {
                     universityName: "$adminDetails.universityName",
                     email: "$adminDetails.email",
-                    city: "$adminDetails.address",
+                    city: "$adminDetails.city",
                     state: "$adminDetails.state"
                 }
             }
@@ -111,5 +111,72 @@ const markHelpRequestAsRead = asyncHandler(async (req, res) => {
     );
 });
 
-export { getAllHelpRequests, markHelpRequestAsRead };
+// Mard as resolved
+const markHelpRequestAsResolved = asyncHandler(async (req, res) => {
+    const { helpRequestId } = req.params;
+    const superAdminId = req.user._id;
+
+    // Fetch the help request details using aggregation pipeline
+    const helpRequest = await HelpRequest.aggregate([
+        { $match: { _id: mongoose.Types.ObjectId(helpRequestId) } },
+        {
+            $lookup: {
+                from: "admins",
+                localField: "adminId",
+                foreignField: "_id",
+                as: "adminDetails"
+            }
+        },
+        { $unwind: "$adminDetails" },
+        {
+            $set: {
+                subject: "$subject",
+                body: "$body",
+                status: "$status",
+                receivedTime: "$receivedTime",
+                resolvedTime: { $cond: [{ $eq: ["$status", "Resolved"] }, new Date(), null] },
+                admin: {
+                    universityName: "$adminDetails.universityName",
+                    email: "$adminDetails.email",
+                    city: "$adminDetails.city",
+                    state: "$adminDetails.state"
+                }
+            }
+        }
+    ]);
+
+    // If no help request found, return an error
+    if (!helpRequest || helpRequest.length === 0) {
+        throw new APIError(404, "❌ Help request not found");
+    }
+
+    const updatedHelpRequest = helpRequest[0];
+
+    // If the help request is not yet resolved, update it
+    if (updatedHelpRequest.status !== "Resolved") {
+        const updateResult = await HelpRequest.findByIdAndUpdate(
+            helpRequestId,
+            {
+                status: "Resolved",
+                resolvedTime: new Date(),
+                resolvedBy: superAdminId
+            },
+            { new: true }
+        );
+
+        if (!updateResult) {
+            throw new APIError(500, "❌ Failed to update the help request to resolved");
+        }
+
+        updatedHelpRequest.status = "Resolved";
+        updatedHelpRequest.resolvedTime = new Date();
+        updatedHelpRequest.id = updatedHelpRequest._id;
+    }
+
+    return res.status(200).json(
+        new APIResponse(200, updatedHelpRequest, "✅ Help request marked as resolved")
+    );
+});
+
+export { getAllHelpRequests, markHelpRequestAsRead, markHelpRequestAsResolved };
 
