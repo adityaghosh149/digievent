@@ -71,5 +71,15 @@ const requireSuperAdmin = (req, res, next) => {
     next();
 };
 
-export { requireRootSuperAdmin, requireSuperAdmin, verifyJWT };
+const requireAdmin = (req, res, next) => {
+    const user = req.user;
+
+    if (!user && req.user?.role !== "Admin") {
+        return res.status(403).json({ message: "⛔ Access denied. Admin only." });
+    }
+
+    next();
+};
+
+export { requireAdmin, requireRootSuperAdmin, requireSuperAdmin, verifyJWT };
 

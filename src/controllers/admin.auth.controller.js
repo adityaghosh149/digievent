@@ -4,6 +4,7 @@ import { APIResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHander.js";
 import { generateAccessAndRefreshTokens } from "../utils/tokens.js";
 
+// Login Admin
 const loginAdmin = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
@@ -52,6 +53,34 @@ const loginAdmin = asyncHandler(async (req, res) => {
         );
 });
 
+// Logout Admin
+const logoutAdmin = asyncHandler(async (req, res) => {
+    const { user } = req.body;
 
-export { loginAdmin };
+    const updatedAdmin = await Admin.findByIdAndUpdate(
+        user?._id,
+        {
+            $set: {
+                refreshToken: undefined,
+            },
+        },
+        { new: true }
+    );
 
+    if (!updatedAdmin) {
+        throw new APIError(404, "❌ Admin not found for logout");
+    }
+
+    const options = {
+        httpOnly: true,
+        secure: true,
+    };
+
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new APIResponse(200, {}, "✅ Admin logged out successfully"));
+});
+
+export { loginAdmin, logoutAdmin };
