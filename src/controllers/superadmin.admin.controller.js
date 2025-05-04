@@ -18,13 +18,12 @@ const registerAdmin = asyncHandler(async (req, res) => {
         email,
         phoneNumber,
         password,
-        address,
+        city,
         state,
-        country,
     } = req.body;
 
     // Validate required fields
-    if (!universityName || !email || !phoneNumber || !password || !address || !state || !country) {
+    if (!universityName || !email || !phoneNumber || !password || !city|| !state) {
         throw new APIError(400, "⚠️ All fields are required!");
     }
 
@@ -79,9 +78,8 @@ const registerAdmin = asyncHandler(async (req, res) => {
         password, 
         avatar,
         avatarPublicId,
-        address,
+        city,
         state,
-        country,
     });
 
     const createdAdmin = await Admin.findById(newAdmin._id).select("-password -refreshToken");
@@ -132,4 +130,22 @@ const resumeAdmin = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerAdmin, resumeAdmin, suspendAdmin };
+export const getAllAdmins = asyncHandler(async (req, res) => {
+    const { subscriptionStatus } = req.query;
+
+    const filter = { isDeleted: false };
+
+    if (subscriptionStatus) {
+        filter.subscriptionStatus = subscriptionStatus;
+    }
+
+    const admins = await Admin.find(filter).select(
+        "_id universityName avatar phoneNumber city email subscriptionStatus"
+    );
+
+    return res.status(200).json(
+        new APIResponse(200, admins, "✅ Admins fetched successfully")
+    );
+});
+
+export { getAllAdmins, registerAdmin, resumeAdmin, suspendAdmin };

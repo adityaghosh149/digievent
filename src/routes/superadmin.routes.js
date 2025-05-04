@@ -19,12 +19,13 @@ router.route("/delete").post(verifyJWT, requireRootSuperAdmin, deleteSuperAdmin)
 router.route("/logout").post(verifyJWT, logoutSuperAdmin);
 
 // admin routes
+router.route("/admins").get(verifyJWT, getAllAdmins);
 router.route("/admin/register").post(
     verifyJWT, 
     uploadFile("avatar", "image"),  // Upload 'avatar' as image
     registerAdmin
 );
-router.route("admin/suspend/:adminId").post(verifyJWT, suspendAdmin);
-router.route("admin/resume/:adminId").post(verifyJWT, resumeAdmin);
+router.route("admin/suspend/:adminId").patch(verifyJWT, suspendAdmin);
+router.route("admin/resume/:adminId").patch(verifyJWT, resumeAdmin);
 
 export default router;

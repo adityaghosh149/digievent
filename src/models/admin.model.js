@@ -41,7 +41,7 @@ const adminSchema = new mongoose.Schema(
             type: String, 
             default: null,
         },
-        address: {
+        city: {
             type: String,
             required: true
         },
@@ -49,13 +49,9 @@ const adminSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        country: {
-            type: String,
-            required: true
-        },
         subscriptionStatus: {
             type: String,
-            enum: ["Active", "Pending", "Expired"],
+            enum: ["Active", "Expired"],
             default: "Active"
         },
         subscriptionEndDate: {
