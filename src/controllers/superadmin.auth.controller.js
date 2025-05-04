@@ -266,7 +266,7 @@ const deleteSuperAdmin = asyncHandler(async (req, res) => {
     );
 });
 
-const refreshAccessToken = asyncHandler(async (req, res) => {
+const refreshAccessTokenForSuperAdmin = asyncHandler(async (req, res) => {
     const incomingRefreshToken =
         req.cookies.refreshToken || req.body.refreshToken;
 
@@ -334,5 +334,5 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 });
 
-export { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, refreshAccessToken, registerSuperAdmin, updateSuperAdmin };
+export { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, refreshAccessTokenForSuperAdmin, registerSuperAdmin, updateSuperAdmin };
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getAllAdmins, registerAdmin, resumeAdmin, suspendAdmin } from "../controllers/superadmin.admin.controller.js";
-import { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, refreshAccessToken, registerSuperAdmin, updateSuperAdmin } from "../controllers/superadmin.auth.controller.js";
+import { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, refreshAccessTokenForSuperAdmin, registerSuperAdmin, updateSuperAdmin } from "../controllers/superadmin.auth.controller.js";
 import { getAllHelpRequests, markHelpRequestAsRead, markHelpRequestAsResolved } from "../controllers/superadmin.helpRequests.controller.js";
 import { requireRootSuperAdmin, requireSuperAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
 import { uploadFile } from "../middlewares/multer.middleware.js";
@@ -14,7 +14,7 @@ router.route("/login").post(loginSuperAdmin);
 
 // auth routes
 router.route("/register").post(verifyJWT, requireRootSuperAdmin, registerSuperAdmin);
-router.route("/refresh-token").post(verifyJWT, requireSuperAdmin, refreshAccessToken)
+router.route("/refresh-token").post(verifyJWT, requireSuperAdmin, refreshAccessTokenForSuperAdmin)
 router.route("/update").put(
     verifyJWT,
     requireSuperAdmin,
