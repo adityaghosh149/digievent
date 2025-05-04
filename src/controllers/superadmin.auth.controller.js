@@ -266,5 +266,73 @@ const deleteSuperAdmin = asyncHandler(async (req, res) => {
     );
 });
 
-export { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, registerSuperAdmin, updateSuperAdmin };
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    const incomingRefreshToken =
+        req.cookies.refreshToken || req.body.refreshToken;
+
+    if (!incomingRefreshToken) {
+        throw new APIError(401, "🔐 Unauthorized request");
+    }
+
+    try {
+        const decodedToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.REFRESH_TOKEN_SECRET
+        );
+
+        const superAdmin = await SuperAdmin.findById(decodedToken?._id);
+
+        if (!superAdmin) {
+            throw new APIError(401, "🚫 Invalid refresh token");
+        }
+
+        if (incomingRefreshToken !== superAdmin?.refreshToken) {
+            throw new APIError(
+                401,
+                "🔄 Refresh token is expired or already used!"
+            );
+        }
+
+        const { newAccessToken, newRefreshToken } = await generateAccessAndRefreshTokens(superAdmin);
+
+        superAdmin.refreshToken = newRefreshToken;
+        await superAdmin.save();
+
+        const user = {
+            id: superAdmin._id,
+            email: superAdmin.email,
+            name: superAdmin.name,
+            phoneNumber: superAdmin.phoneNumber,
+            isRoot: superAdmin.isRoot,
+        };
+
+        const options = {
+            httpOnly: true,
+            secure: true,
+        };
+
+        return res
+            .status(200)
+            .cookie("accessToken", newAccessToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
+            .json(
+                new APIResponse(
+                    200,
+                    {
+                        user,
+                        newAccessToken,
+                        newRefreshToken,
+                    },
+                    "✅ Access token refreshed"
+                )
+            );
+    } catch (error) {
+        throw new APIError(
+            401,
+            error?.message || "❌ Invalid Refresh Token! 🔄🚫"
+        );
+    }
+});
+
+export { deleteSuperAdmin, loginSuperAdmin, logoutSuperAdmin, refreshAccessToken, registerSuperAdmin, updateSuperAdmin };
 
