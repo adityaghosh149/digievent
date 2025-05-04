@@ -18,5 +18,6 @@ app.use(express.static("public"));
 
 // routes
 app.use("/api/v1/superadmin", superAdminRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 export default app;
