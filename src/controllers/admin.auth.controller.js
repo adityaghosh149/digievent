@@ -83,4 +83,73 @@ const logoutAdmin = asyncHandler(async (req, res) => {
         .json(new APIResponse(200, {}, "✅ Admin logged out successfully"));
 });
 
-export { loginAdmin, logoutAdmin };
+const refreshAccessTokenForAdmin = asyncHandler(async (req, res) => {
+    const incomingRefreshToken =
+        req.cookies.refreshToken || req.body.refreshToken;
+
+    if (!incomingRefreshToken) {
+        throw new APIError(401, "🔐 Unauthorized request");
+    }
+
+    try {
+        const decodedToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.REFRESH_TOKEN_SECRET
+        );
+
+        const admin = await Admin.findById(decodedToken?._id);
+
+        if (!admin) {
+            throw new APIError(401, "🚫 Invalid refresh token");
+        }
+
+        if (incomingRefreshToken !== admin?.refreshToken) {
+            throw new APIError(
+                401,
+                "🔄 Refresh token is expired or already used!"
+            );
+        }
+
+        const { newAccessToken, newRefreshToken } = await generateAccessAndRefreshTokens(admin);
+
+        admin.refreshToken = newRefreshToken;
+        await admin.save();
+
+        const user = {
+            id: admin._id,
+            email: admin.email,
+            universityName: admin.universityName,
+            phoneNumber: admin.phoneNumber,
+        };
+
+        const options = {
+            httpOnly: true,
+            secure: true,
+        };
+
+        return res
+            .status(200)
+            .cookie("accessToken", newAccessToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
+            .json(
+                new APIResponse(
+                    200,
+                    {
+                        user,
+                        newAccessToken,
+                        newRefreshToken,
+                    },
+                    "✅ Access token refreshed"
+                )
+            );
+    } catch (error) {
+        throw new APIError(
+            401,
+            error?.message || "❌ Invalid Refresh Token! 🔄🚫"
+        );
+    }
+});
+
+
+export { loginAdmin, logoutAdmin, refreshAccessTokenForAdmin };
+
