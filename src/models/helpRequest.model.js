@@ -31,9 +31,17 @@ const helpRequestSchema = new mongoose.Schema(
             type: Date,
             default: null,
         },
+        readBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "SuperAdmin"
+        },
         resolvedTime: {
             type: Date,
             default: null,
+        },
+        resolvedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "SuperAdmin"
         },
     },
     {
