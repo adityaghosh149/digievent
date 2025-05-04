@@ -2,6 +2,7 @@ import { Admin } from "../models/admin.model.js";
 import { APIError } from "../utils/apiError.js";
 import { APIResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHander.js";
+import { generateAccessAndRefreshTokens } from "../utils/tokens.js";
 
 const loginAdmin = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
@@ -16,8 +17,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
         throw new APIError(401, "❌ Invalid credentials");
     }
 
-    const accessToken = await admin.generateAccessToken();
-    const refreshToken = await admin.generateRefreshToken();
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(admin);
 
     admin.refreshToken = refreshToken;
     await admin.save();
@@ -42,7 +42,11 @@ const loginAdmin = asyncHandler(async (req, res) => {
         .json(
             new APIResponse(
                 200,
-                user,
+                {
+                    user,
+                    accessToken,
+                    refreshToken,
+                },
                 "✅ Admin logged in successfully"
             )
         );

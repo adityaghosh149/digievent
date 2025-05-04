@@ -6,6 +6,7 @@ import {
     replaceOnCloudinary,
     uploadOnCloudinary,
 } from "../utils/cloudinary.js";
+import { generateAccessAndRefreshTokens } from "../utils/tokens.js";
 import { isStrongPassword, isValidEmail, isValidIndianPhoneNumber } from "../utils/validators.js";
 
 // Login SuperAdmin
@@ -16,24 +17,23 @@ const loginSuperAdmin = asyncHandler(async (req, res) => {
         throw new APIError(400, "⚠️ Email and password are required");
     }
 
-    const admin = await SuperAdmin.findOne({ email });
+    const superAdmin = await SuperAdmin.findOne({ email });
 
-    if (!admin || admin.isDeleted || !(await admin.isPasswordCorrect(password))) {
+    if (!superAdmin || superAdmin.isDeleted || !(await superAdmin.isPasswordCorrect(password))) {
         throw new APIError(401, "❌ Invalid credentials");
     }
 
-    const accessToken = await admin.generateAccessToken();
-    const refreshToken = await admin.generateRefreshToken();
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(superAdmin);
 
-    admin.refreshToken = refreshToken;
-    await admin.save();
+    superAdmin.refreshToken = refreshToken;
+    await superAdmin.save();
 
     const user = {
-        id: admin._id,
-        email: admin.email,
-        name: admin.name,
-        phoneNumber: admin.phoneNumber,
-        isRoot: admin.isRoot,
+        id: superAdmin._id,
+        email: superAdmin.email,
+        name: superAdmin.name,
+        phoneNumber: superAdmin.phoneNumber,
+        isRoot: superAdmin.isRoot,
     };
 
     const options = {
@@ -48,7 +48,11 @@ const loginSuperAdmin = asyncHandler(async (req, res) => {
         .json(
             new APIResponse(
                 200,
-                user,
+                {
+                    user,
+                    accessToken,
+                    refreshToken,
+                },
                 "✅ SuperAdmin logged in successfully"
             )
         );
