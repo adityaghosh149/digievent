@@ -150,6 +150,86 @@ const refreshAccessTokenForAdmin = asyncHandler(async (req, res) => {
     }
 });
 
+import { Admin } from "../models/admin.model.js";
+import { APIError } from "../utils/apiError.js";
+import { APIResponse } from "../utils/apiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { replaceOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
+import { isValidIndianPhoneNumber } from "../utils/validators.js";
 
-export { loginAdmin, logoutAdmin, refreshAccessTokenForAdmin };
+// Update Admin
+const updateAdmin = asyncHandler(async (req, res) => {
+    const { adminId } = req.params;
+    const { fullName, phoneNumber, password, newPassword, confirmPassword } = req.body;
+
+    // Find admin by ID
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+        throw new APIError(404, "❌ Admin not found");
+    }
+
+    // Handle password update if provided
+    if (password && newPassword && confirmPassword) {
+        const isPasswordValid = await admin.isPasswordCorrect(password);
+        if (!isPasswordValid) {
+            throw new APIError(401, "❌ Invalid current password");
+        }
+
+        if (newPassword !== confirmPassword) {
+            throw new APIError(400, "⚠️ New password and confirm password do not match");
+        }
+
+        admin.password = newPassword;
+    }
+
+    // Handle phone number update
+    if (phoneNumber) {
+        if (!isValidIndianPhoneNumber(phoneNumber)) {
+            throw new APIError(400, "📱 Invalid phone number! Must be a valid 10-digit Indian number starting with 6-9.");
+        }
+        admin.phoneNumber = phoneNumber;
+    }
+
+    // Handle avatar upload or replacement
+    if (req?.file) {
+        let response;
+
+        if (admin.avatarPublicId) {
+            try {
+                // Try replacing the existing avatar if the public ID is valid
+                response = await replaceOnCloudinary(req.file.path, admin.avatarPublicId);
+            } catch (err) {
+                // If the public ID is invalid, fallback to uploading a new image
+                response = await uploadOnCloudinary(req.file.path);
+            }
+        } else {
+            // If there's no avatar yet, upload a new one
+            response = await uploadOnCloudinary(req.file.path);
+        }
+
+        if (!response) {
+            throw new APIError(500, "❌ Failed to upload or replace avatar on Cloudinary");
+        }
+
+        admin.avatar = response.secure_url;
+        admin.avatarPublicId = response.public_id;
+    }
+
+    // Update full name if provided
+    if (fullName) {
+        admin.fullName = fullName;
+    }
+
+    // Save the updated admin details
+    await admin.save();
+
+    // Fetch the updated admin without sensitive data (password, refresh token)
+    const updatedAdmin = await Admin.findById(adminId).select("-password -refreshToken");
+
+    return res.status(200).json(
+        new APIResponse(200, updatedAdmin, "✅ Admin updated successfully")
+    );
+});
+
+export { loginAdmin, logoutAdmin, refreshAccessTokenForAdmin, updateAdmin };
 
