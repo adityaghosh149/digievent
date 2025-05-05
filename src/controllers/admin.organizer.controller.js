@@ -4,6 +4,7 @@ import { APIError } from "../utils/apiError.js";
 import { APIResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHander.js";
 
+// Register Organizer
 const registerOrganizer = asyncHandler(async (req, res) => {
     const requester = req.user; // Must be Admin, validated via verifyJWT
 
@@ -88,6 +89,7 @@ const registerOrganizer = asyncHandler(async (req, res) => {
     );
 });
 
+// Update Organizer
 const updateOrganizer = asyncHandler(async (req, res) => {
     const { organizerId } = req.params;
     const adminId = req.user._id; // The currently authenticated admin making the request
@@ -155,5 +157,21 @@ const updateOrganizer = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerOrganizer, updateOrganizer };
+// Get All Orgainzers
+const getAllOrganizers = asyncHandler(async (req, res) => {
+    const adminId = req.user._id; // The currently authenticated admin making the request
+
+    const organizers = await Organizer.find({ adminId, isDeleted: false }) // Filter by adminId and exclude deleted organizers
+        .select("-password -refreshToken"); // Exclude sensitive fields
+
+    return res.status(200).json(
+        new APIResponse(
+            200,
+            organizers, // If no organizers, an empty array will be returned
+            "✅ All organizers for this admin retrieved successfully"
+        )
+    );
+});
+
+export { getAllOrganizers, registerOrganizer, updateOrganizer };
 

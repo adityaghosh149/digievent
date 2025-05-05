@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { loginAdmin, logoutAdmin, refreshAccessTokenForAdmin, updateAdmin } from "../controllers/admin.auth.controller.js";
-import { registerOrganizer, updateOrganizer } from "../controllers/admin.organizer.controller.js";
+import { getAllOrganizers, registerOrganizer, updateOrganizer } from "../controllers/admin.organizer.controller.js";
 import { requireAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
 import { uploadFile } from "../middlewares/multer.middleware.js";
 
@@ -22,6 +22,7 @@ router.route("/update/:adminId").patch(
 router.route("/refesh-token").post(verifyJWT, requireAdmin, refreshAccessTokenForAdmin);
 
 // organizer routes
+router.route("/organizers").get(verifyJWT, requireAdmin, getAllOrganizers);
 router.route("/organizer/register").post(
     verifyJWT, 
     requireAdmin,
