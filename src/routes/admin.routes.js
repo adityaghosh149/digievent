@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { loginAdmin, logoutAdmin, refreshAccessTokenForAdmin, updateAdmin } from "../controllers/admin.auth.controller.js";
-import { registerOrganizer } from "../controllers/admin.organizer.controller.js";
+import { registerOrganizer, updateOrganizer } from "../controllers/admin.organizer.controller.js";
 import { requireAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
 import { uploadFile } from "../middlewares/multer.middleware.js";
 
@@ -28,5 +28,11 @@ router.route("/organizer/register").post(
     uploadFile("avatar", "image", true), 
     registerOrganizer
 );
+router.route("organizer/update/:organizerId").patch(
+    verifyJWT,
+    requireAdmin,
+    uploadFile("avatar", "image", true),
+    updateOrganizer
+)
 
 export default router;
