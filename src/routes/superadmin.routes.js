@@ -15,7 +15,7 @@ router.route("/login").post(loginSuperAdmin);
 // auth routes
 router.route("/register").post(verifyJWT, requireRootSuperAdmin, registerSuperAdmin);
 router.route("/refresh-token").post(verifyJWT, requireSuperAdmin, refreshAccessTokenForSuperAdmin)
-router.route("/update").put(
+router.route("/update/:superAdminId").put(
     verifyJWT,
     requireSuperAdmin,
     uploadFile("avatar", "image", true),

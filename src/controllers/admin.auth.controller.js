@@ -150,13 +150,6 @@ const refreshAccessTokenForAdmin = asyncHandler(async (req, res) => {
     }
 });
 
-import { Admin } from "../models/admin.model.js";
-import { APIError } from "../utils/apiError.js";
-import { APIResponse } from "../utils/apiResponse.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { replaceOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
-import { isValidIndianPhoneNumber } from "../utils/validators.js";
-
 // Update Admin
 const updateAdmin = asyncHandler(async (req, res) => {
     const { adminId } = req.params;
@@ -232,4 +225,3 @@ const updateAdmin = asyncHandler(async (req, res) => {
 });
 
 export { loginAdmin, logoutAdmin, refreshAccessTokenForAdmin, updateAdmin };
-

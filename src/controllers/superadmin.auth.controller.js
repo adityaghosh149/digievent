@@ -164,12 +164,21 @@ const updateSuperAdmin = asyncHandler(async (req, res) => {
         throw new APIError(404, "❌ SuperAdmin not found");
     }
 
-    // Password update logic (only if password and newPassword are provided)
-    if (password && newPassword && confirmPassword) {
+    // Password update logic (only if any password-related fields are provided)
+    if (password || newPassword || confirmPassword) {
+        // Ensure all password-related fields are provided if one is
+        if (!password || !newPassword || !confirmPassword) {
+            throw new APIError(400, "❌ Please provide all password fields: current password, new password, and confirm password");
+        }
+
         // Check if the current password is correct
         const isPasswordValid = await superAdmin.isPasswordCorrect(password);
         if (!isPasswordValid) {
             throw new APIError(401, "❌ Invalid current password");
+        }
+
+        if (!isStrongPassword(newPassword)) {
+            throw new APIError(400, "❌ New password is not strong enough. Please use at least 8 characters, including uppercase, lowercase, numbers, and special characters.");
         }
 
         // Validate if new password and confirm password match
@@ -183,27 +192,35 @@ const updateSuperAdmin = asyncHandler(async (req, res) => {
 
     // Update phone number if provided
     if (phoneNumber) {
-        
         if (!isValidIndianPhoneNumber(phoneNumber)) {
             throw new APIError(400, "📱 Invalid phone number! Must be a valid 10-digit Indian number starting with 6-9.");
         }
-
         superAdmin.phoneNumber = phoneNumber;
     }
 
     // Handle avatar image update (if new avatar is uploaded)
     if (req?.file) {
-        // Upload the file to Cloudinary
-        const response = await uploadOnCloudinary(req.file.path);
+        let response;
 
-        // Check if the upload was successful
-        if (!response) {
-            throw new APIError(500, "❌ Failed to upload avatar to Cloudinary");
+        if (superAdmin.avatarPublicId) {
+            try {
+                // Try replacing the existing avatar if the public ID is valid
+                response = await replaceOnCloudinary(req.file.path, superAdmin.avatarPublicId);
+            } catch (err) {
+                // If the public ID is invalid, fallback to uploading a new image
+                response = await uploadOnCloudinary(req.file.path);
+            }
+        } else {
+            // If there's no avatar yet, upload a new one
+            response = await uploadOnCloudinary(req.file.path);
         }
 
-        // Assign the secure URL and public ID to the avatar variables
-        avatar = response.secure_url;
-        avatarPublicId = response.public_id;
+        if (!response) {
+            throw new APIError(500, "❌ Failed to upload or replace avatar on Cloudinary");
+        }
+
+        superAdmin.avatar = response.secure_url;
+        superAdmin.avatarPublicId = response.public_id;
     }
 
     // Update other fields
@@ -266,6 +283,7 @@ const deleteSuperAdmin = asyncHandler(async (req, res) => {
     );
 });
 
+// Refresh Access Token
 const refreshAccessTokenForSuperAdmin = asyncHandler(async (req, res) => {
     const incomingRefreshToken =
         req.cookies.refreshToken || req.body.refreshToken;
