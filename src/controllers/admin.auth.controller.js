@@ -152,30 +152,43 @@ const refreshAccessTokenForAdmin = asyncHandler(async (req, res) => {
 
 // Update Admin
 const updateAdmin = asyncHandler(async (req, res) => {
-    const { adminId } = req.params;
+    const { adminId } = req.params; // Extracting Admin ID from params
     const { fullName, phoneNumber, password, newPassword, confirmPassword } = req.body;
-
-    // Find admin by ID
+    
+    // Finding the Admin by ID
     const admin = await Admin.findById(adminId);
     if (!admin) {
         throw new APIError(404, "❌ Admin not found");
     }
 
-    // Handle password update if provided
-    if (password && newPassword && confirmPassword) {
+    // Password update logic (only if any password-related fields are provided)
+    if (password || newPassword || confirmPassword) {
+        // Ensure all password-related fields are provided if one is
+        if (!password || !newPassword || !confirmPassword) {
+            throw new APIError(400, "❌ Please provide all password fields: current password, new password, and confirm password");
+        }
+
+        // Check if the current password is correct
         const isPasswordValid = await admin.isPasswordCorrect(password);
         if (!isPasswordValid) {
             throw new APIError(401, "❌ Invalid current password");
         }
 
+        // Check if new password is strong
+        if (!isStrongPassword(newPassword)) {
+            throw new APIError(400, "❌ New password is not strong enough. Please use at least 8 characters, including uppercase, lowercase, numbers, and special characters.");
+        }
+
+        // Validate if new password and confirm password match
         if (newPassword !== confirmPassword) {
             throw new APIError(400, "⚠️ New password and confirm password do not match");
         }
 
-        admin.password = newPassword;
+        // The password update will be handled by the pre-save hook in the model
+        admin.password = newPassword; // Update password (this will trigger the pre-save hook for hashing)
     }
 
-    // Handle phone number update
+    // Update phone number if provided
     if (phoneNumber) {
         if (!isValidIndianPhoneNumber(phoneNumber)) {
             throw new APIError(400, "📱 Invalid phone number! Must be a valid 10-digit Indian number starting with 6-9.");
@@ -183,7 +196,7 @@ const updateAdmin = asyncHandler(async (req, res) => {
         admin.phoneNumber = phoneNumber;
     }
 
-    // Handle avatar upload or replacement
+    // Handle avatar image update (if new avatar is uploaded)
     if (req?.file) {
         let response;
 
@@ -208,19 +221,18 @@ const updateAdmin = asyncHandler(async (req, res) => {
         admin.avatarPublicId = response.public_id;
     }
 
-    // Update full name if provided
-    if (fullName) {
-        admin.fullName = fullName;
-    }
-
-    // Save the updated admin details
+    // Save the updated Admin data
     await admin.save();
 
-    // Fetch the updated admin without sensitive data (password, refresh token)
+    // Return success response with updated Admin data (excluding sensitive info)
     const updatedAdmin = await Admin.findById(adminId).select("-password -refreshToken");
 
     return res.status(200).json(
-        new APIResponse(200, updatedAdmin, "✅ Admin updated successfully")
+        new APIResponse(
+            200, 
+            updatedAdmin, 
+            "✅ Admin updated successfully"
+        )
     );
 });
 
