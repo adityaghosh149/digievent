@@ -223,11 +223,6 @@ const updateSuperAdmin = asyncHandler(async (req, res) => {
         superAdmin.avatarPublicId = response.public_id;
     }
 
-    // Update other fields
-    if (fullName) {
-        superAdmin.fullName = fullName;
-    }
-
     // Save the updated SuperAdmin data
     await superAdmin.save();
 
