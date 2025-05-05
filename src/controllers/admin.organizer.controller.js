@@ -90,12 +90,18 @@ const registerOrganizer = asyncHandler(async (req, res) => {
 
 const updateOrganizer = asyncHandler(async (req, res) => {
     const { organizerId } = req.params;
+    const adminId = req.user._id; // The currently authenticated admin making the request
 
     const { organizerName, clubName, phoneNumber } = req.body;
 
     const organizer = await Organizer.findById(organizerId);
     if (!organizer || organizer.isDeleted) {
         throw new APIError(404, "❌ Organizer not found or deleted");
+    }
+
+    // Check if the current admin is the same admin who created this organizer
+    if (organizer.adminId.toString() !== adminId.toString()) {
+        throw new APIError(403, "❌ You are not authorized to update this organizer");
     }
 
     // Phone number update
