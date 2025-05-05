@@ -14,6 +14,11 @@ const organizerSchema = new mongoose.Schema(
             required: true,
             trim: true
         },
+        clubName: {
+            type: String,
+            required: true,
+            trim: true
+        },
         email: {
             type: String,
             required: true,
