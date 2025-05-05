@@ -53,53 +53,78 @@ const pdfFilter = (req, file, cb) => {
 };
 
 // Single file upload function
-const uploadFile = (fieldName, type = 'image') => {
-    let fileFilter;
+const fileTypeFilters = {
+    image: imageFilter,
+    pdf: pdfFilter,
+};
 
-    // Choose filter based on type (image or pdf)
-    if (type === 'image') {
-        fileFilter = imageFilter;
-    } else if (type === 'pdf') {
-        fileFilter = pdfFilter;
+const uploadFile = (fieldName, type, optional = false) => {
+    if (!fieldName || !type) {
+        throw new Error("❌ 'fieldName' and 'type' are required parameters.");
+    }
+
+    const fileFilter = fileTypeFilters[type];
+    if (!fileFilter) {
+        throw new Error(`❌ Unsupported file type: ${type}`);
     }
 
     const upload = multer({
         storage,
-        limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-        fileFilter: fileFilter,
-    });
+        limits: { fileSize: 10 * 1024 * 1024 },
+        fileFilter,
+    }).single(fieldName);
 
-    return upload.single(fieldName); // Single file upload for a specific field
+    return (req, res, next) => {
+        upload(req, res, (err) => {
+            if (err) return next(err);
+
+            if (!optional && !req.file) {
+                return next(new APIError(400, `❌ '${fieldName}' file is required.`));
+            }
+
+            next();
+        });
+    };
 };
+
 
 // Multiple file upload function
 const uploadFiles = (fields) => {
-    const fileFilters = {};
-
-    // Dynamically assign file filters based on field type
-    fields.forEach(field => {
-        if (field.type === 'image') {
-            fileFilters[field.name] = imageFilter;
-        } else if (field.type === 'pdf') {
-            fileFilters[field.name] = pdfFilter;
-        }
-    });
+    if (!Array.isArray(fields) || fields.length === 0) {
+        throw new Error("❌ 'fields' must be a non-empty array.");
+    }
 
     const upload = multer({
         storage,
-        limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+        limits: { fileSize: 10 * 1024 * 1024 },
         fileFilter: (req, file, cb) => {
-            const filter = fileFilters[file.fieldname];
-            if (filter) {
-                filter(req, file, cb);
+            const field = fields.find(f => f.name === file.fieldname);
+            const fileFilter = field ? fileTypeFilters[field.type] : null;
+
+            if (fileFilter) {
+                fileFilter(req, file, cb);
             } else {
-                cb(new APIError(400, "❌ Invalid file type!"));
+                cb(new APIError(400, `❌ Invalid or unsupported file type for field: ${file.fieldname}`));
             }
         },
-    });
+    }).fields(fields.map(field => ({ name: field.name, maxCount: field.maxCount || 1 })));
 
-    return upload.fields(fields.map(field => ({ name: field.name, maxCount: field.maxCount || 1 })));
+    return (req, res, next) => {
+        upload(req, res, (err) => {
+            if (err) return next(err);
+
+            for (const field of fields) {
+                const files = req.files?.[field.name];
+                const isOptional = field.optional || false;
+
+                if (!isOptional && (!files || files.length === 0)) {
+                    return next(new APIError(400, `❌ '${field.name}' file is required.`));
+                }
+            }
+
+            next();
+        });
+    };
 };
 
 export { uploadFile, uploadFiles };
-

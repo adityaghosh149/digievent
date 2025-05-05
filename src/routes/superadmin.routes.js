@@ -18,7 +18,7 @@ router.route("/refresh-token").post(verifyJWT, requireSuperAdmin, refreshAccessT
 router.route("/update").put(
     verifyJWT,
     requireSuperAdmin,
-    uploadFile("avatar", "image"),
+    uploadFile("avatar", "image", true),
     updateSuperAdmin
 );
 router.route("/delete").post(verifyJWT, requireRootSuperAdmin, deleteSuperAdmin);
@@ -34,7 +34,7 @@ router.route("/admins").get(verifyJWT, requireSuperAdmin, getAllAdmins);
 router.route("/admin/register").post(
     verifyJWT, 
     requireSuperAdmin,
-    uploadFile("avatar", "image"),  // Upload 'avatar' as image
+    uploadFile("avatar", "image", true), 
     registerAdmin
 );
 router.route("admin/suspend/:adminId").patch(verifyJWT, requireSuperAdmin, suspendAdmin);
