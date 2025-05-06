@@ -14,7 +14,7 @@ router.route("/login").post(loginAdmin);
 
 // auth routes
 router.route("/logout").post(verifyJWT, requireAdmin, logoutAdmin);
-router.route("/update/:adminId").patch(
+router.route("/update").patch(
     verifyJWT, 
     requireAdmin, 
     uploadFile("avatar", "image", true), 

@@ -152,8 +152,8 @@ const refreshAccessTokenForAdmin = asyncHandler(async (req, res) => {
 
 // Update Admin
 const updateAdmin = asyncHandler(async (req, res) => {
-    const { adminId } = req.params; // Extracting Admin ID from params
-    const { fullName, phoneNumber, password, newPassword, confirmPassword } = req.body;
+    const adminId = req.user._id 
+    const { phoneNumber, password, newPassword, confirmPassword } = req.body;
     
     // Finding the Admin by ID
     const admin = await Admin.findById(adminId);
@@ -237,3 +237,4 @@ const updateAdmin = asyncHandler(async (req, res) => {
 });
 
 export { loginAdmin, logoutAdmin, refreshAccessTokenForAdmin, updateAdmin };
+
