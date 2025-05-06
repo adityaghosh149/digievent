@@ -40,4 +40,47 @@ const addCourse = asyncHandler(async (req, res) => {
     );
 });
 
-export { addCourse, getAllCourses };
+const updateCourse = asyncHandler(async (req, res) => {
+    const adminId = req.user._id;
+    const { courseId } = req.params;
+    const { courseName, duration } = req.body;
+
+    if (!courseName && duration === undefined) {
+        throw new APIError(400, "⚠️ At least one of 'courseName' or 'duration' must be provided");
+    }
+
+    const course = await Course.findOne({ _id: courseId, adminId, isDeleted: false });
+
+    if (!course) {
+        throw new APIError(404, "❌ Course not found");
+    }
+
+    if (courseName && courseName !== course.courseName) {
+        const existingCourse = await Course.findOne({ courseName });
+        if (existingCourse) {
+            throw new APIError(400, "⚠️ Course name already exists");
+        }
+        course.courseName = courseName;
+    }
+
+    if (duration !== undefined) {
+        if (
+            typeof duration !== "number" ||
+            !Number.isInteger(duration) ||
+            duration < 1 ||
+            duration > 5
+        ) {
+            throw new APIError(400, "⚠️ Duration must be an integer between 1 and 5 years");
+        }
+        course.duration = duration;
+    }
+
+    await course.save();
+
+    return res.status(200).json(
+        new APIResponse(200, course, "✏️ Course updated successfully")
+    );
+});
+
+export { addCourse, getAllCourses, updateCourse };
+

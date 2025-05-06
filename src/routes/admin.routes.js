@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { loginAdmin, logoutAdmin, refreshAccessTokenForAdmin, updateAdmin } from "../controllers/admin.auth.controller.js";
-import { addCourse, getAllCourses } from "../controllers/admin.course.controller.js";
+import { addCourse, getAllCourses, updateCourse } from "../controllers/admin.course.controller.js";
 import { getAllOrganizers, registerOrganizer, updateOrganizer } from "../controllers/admin.organizer.controller.js";
 import { requireAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
 import { uploadFile } from "../middlewares/multer.middleware.js";
@@ -40,5 +40,6 @@ router.route("/organizer/update/:organizerId").patch(
 // course routes
 router.route("/courses").get(verifyJWT, requireAdmin, getAllCourses);
 router.route("/course/add-course").post(verifyJWT, requireAdmin, addCourse);
+router.route("/course/update/:courseId").post(verifyJWT, requireAdmin, updateCourse);
 
 export default router;
