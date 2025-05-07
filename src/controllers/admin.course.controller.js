@@ -1,7 +1,7 @@
-import { Course } from "../models/course.model";
-import { APIError } from "../utils/apiError";
-import { APIResponse } from "../utils/apiResponse";
-import { asyncHandler } from "../utils/asyncHander";
+import { Course } from "../models/course.model.js";
+import { APIError } from "../utils/apiError.js";
+import { APIResponse } from "../utils/apiResponse.js";
+import { asyncHandler } from "../utils/asyncHander.js";
 
 const getAllCourses = asyncHandler(async (req, res) => {
     const adminId = req.user._id;
