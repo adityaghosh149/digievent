@@ -326,6 +326,80 @@
     "message": "🎓 Student registered successfully!"
   }
   ```
+Of course! Here's the **documentation for `updateStudent` and `deleteStudent`** following the same structure and style as your example:
+
+---
+
+### **4.2 Update Student**
+
+* **Method:** `PATCH`
+
+* **Endpoint:** `/student/:studentId`
+
+* **Description:** Updates an existing student under the admin.
+
+* **Auth Requirement:** `verifyJWT`, `requireAdmin`
+
+* **Roles Allowed:** Admin
+
+* **Path Params:**
+
+  * `studentId` (string): The ID of the student to update
+
+* **Request Body:**
+  *(At least one field is required to update)*
+
+  ```json
+  {
+    "name": "Updated Name",
+    "rollNumber": "67890",
+    "phoneNumber": "+9123456789",
+    "currentYear": 2026,
+    "avatar": "image-file"  // Optional, only if an avatar is uploaded
+  }
+  ```
+
+* **Response:**
+
+  * **Status:** `200 OK`
+
+  ```json
+  {
+    "statusCode": 200,
+    "data": { /* Updated Student Object excluding password & refreshToken */ },
+    "message": "✏️ Student updated successfully!"
+  }
+  ```
+
+---
+
+### **4.3 Delete Student**
+
+* **Method:** `DELETE`
+
+* **Endpoint:** `/student/:studentId`
+
+* **Description:** Soft deletes a student (marks as deleted instead of permanent removal).
+
+* **Auth Requirement:** `verifyJWT`, `requireAdmin`
+
+* **Roles Allowed:** Admin
+
+* **Path Params:**
+
+  * `studentId` (string): The ID of the student to delete
+
+* **Response:**
+
+  * **Status:** `200 OK`
+
+  ```json
+  {
+    "statusCode": 200,
+    "data": null,
+    "message": "🗑️ Student deleted successfully!"
+  }
+  ```
 
 ---
 
