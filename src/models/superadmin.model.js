@@ -48,7 +48,6 @@ const superAdminSchema = new mongoose.Schema(
         isRootOnlyFlag: {
             type: Boolean,
             default: false,
-            unique: true,
             sparse: true // required so only "true" values are indexed
         },
         isDeleted: {
