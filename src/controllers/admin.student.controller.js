@@ -193,4 +193,29 @@ const updateStudent = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerStudent, updateStudent };
+
+const deleteStudent = asyncHandler(async (req, res) => {
+    const adminId = req.user._id;
+    const { studentId } = req.params;
+
+    const student = await Student.findOne({
+        _id: studentId,
+        adminId,
+        isDeleted: false
+    });
+
+    if (!student) {
+        throw new APIError(404, "❌ Student not found!");
+    }
+
+    student.isDeleted = true;
+    await student.save();
+
+    return res.status(200).json(
+        new APIResponse(200, null, "🗑️ Student deleted (soft delete) successfully!")
+    );
+});
+
+
+export { deleteStudent, registerStudent, updateStudent };
+
