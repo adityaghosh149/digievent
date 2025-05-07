@@ -8,11 +8,11 @@ This document provides an overview of all the available API endpoints for **Digi
 
 ## Table of Contents
 
-1. [SuperAdmin API](./src/docs/superadmin.md)
-2. [Admin API](./src/docs/admin.md)
-3. [Organizer API](./src/docs/organizer.md)
-4. [Student API](./src/docs/student.md)
-5. [Others API](./src/docs/others.md)
+1. [SuperAdmin API](./src/docs/api-docs/superadmin.md)
+2. [Admin API](./src/docs/api-docs/admin.md)
+3. [Organizer API](./src/docs/api-docs/organizer.md)
+4. [Student API](./src/docs/api-docs/student.md)
+5. [Others API](./src/docs/api-docs/others.md)
 
 
 ---
