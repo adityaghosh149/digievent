@@ -2,7 +2,7 @@ import { Router } from "express";
 import { loginAdmin, logoutAdmin, refreshAccessTokenForAdmin, updateAdmin } from "../controllers/admin.auth.controller.js";
 import { addCourse, getAllCourses, updateCourse } from "../controllers/admin.course.controller.js";
 import { getAllOrganizers, registerOrganizer, updateOrganizer } from "../controllers/admin.organizer.controller.js";
-import { registerStudent } from "../controllers/admin.student.controller.js";
+import { registerStudent, updateStudent } from "../controllers/admin.student.controller.js";
 import { requireAdmin, verifyJWT } from "../middlewares/auth.middleware.js";
 import { uploadFile } from "../middlewares/multer.middleware.js";
 
@@ -45,5 +45,6 @@ router.route("/course/update/:courseId").patch(verifyJWT, requireAdmin, updateCo
 
 // student routes
 router.route("/student/register").post(verifyJWT, requireAdmin, registerStudent);
+router.route("/student/update/:studentId").patch(verifyJWT, requireAdmin, updateStudent);
 
 export default router;
